@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SeleneSight — 7-Slide Pitch Deck (NASA Space Apps 2026)</title>
+  <link rel="stylesheet" href="slides.css">
+  <!-- KaTeX for rendering equations -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+  <div class="deck-container" id="deckContainer">
+    
+    <!-- Slide 1: Title & Team -->
+    <section class="slide active" id="slide-1">
+      <div class="slide-badge">NASA SPACE APPS CHALLENGE 2026</div>
+      <h1 class="slide-title">SeleneSight</h1>
+      <h2 class="slide-subtitle">Lunar South Pole Horizon, Solar Power & Direct-to-Earth (DTE) Comm Evaluator</h2>
+      <p class="tagline">Empowering Artemis, CLPS, and International Mission Planners with Instant Topocentric Horizon & Solar Telemetry</p>
+      <div class="team-grid">
+        <div class="member-chip"><strong>Abhijith B S</strong><span>Team Lead & Full-Stack Architect</span></div>
+        <div class="member-chip"><strong>Anusree S</strong><span>Lunar Topography & LOLA Data Lead</span></div>
+        <div class="member-chip"><strong>Alfiya S</strong><span>UI/UX & Interactive Visuals Lead</span></div>
+        <div class="member-chip"><strong>Adith V S</strong><span>Mission Science & Demo Pitch Lead</span></div>
+      </div>
+      <div class="slide-footer">Slide 1 / 7 • Use Arrow Keys [← / →] or Spacebar to Navigate</div>
+    </section>
+
+    <!-- Slide 2: The Problem -->
+    <section class="slide" id="slide-2">
+      <div class="slide-badge">THE PROBLEM</div>
+      <h2 class="slide-title">The Lunar South Pole Operational Bottleneck</h2>
+      <div class="content-split">
+        <div class="card">
+          <h3>☀️ Extreme Grazing Sunlight</h3>
+          <p>The Moon's <strong>1.54° axial tilt</strong> keeps the Sun skimming the horizon in a 360° circle. Horizontal solar panels yield <strong>under 3% efficiency</strong>. Even modest crater rims cast 20-km shadows.</p>
+        </div>
+        <div class="card">
+          <h3>📡 Libration Radio Blackouts</h3>
+          <p>Optical libration (<strong>±6.68° lat, ±7.90° lon</strong>) causes Earth to nod up and down, dropping below jagged massifs and severing Direct-to-Earth (DTE) communications.</p>
+        </div>
+      </div>
+      <div class="highlight-box">
+        Existing desktop mission tools (SPICE kernels, desktop GIS) are fragmented, complex, and inaccessible to field planners and rapid mission evaluators.
+      </div>
+      <div class="slide-footer">Slide 2 / 7</div>
+    </section>
+
+    <!-- Slide 3: The Solution -->
+    <section class="slide" id="slide-3">
+      <div class="slide-badge">OUR SOLUTION</div>
+      <h2 class="slide-title">SeleneSight: Topocentric Clarity in Seconds</h2>
+      <div class="three-col">
+        <div class="card mini">
+          <div class="icon">🧭</div>
+          <h4>360° Polar Dome Skyplot</h4>
+          <p>Real-time projection of solar tracks, Earth libration Lissajous loops, and LOLA shadow masks.</p>
+        </div>
+        <div class="card mini">
+          <div class="icon">📈</div>
+          <h4>708-Hour Ribbon Timeline</h4>
+          <p>Complete synodic cycle power curves, DTE communication windows, and scrubber telemetry.</p>
+        </div>
+        <div class="card mini">
+          <div class="icon">⚖️</div>
+          <h4>Scenario Comparator</h4>
+          <p>Side-by-side trade-off deltas (Site A vs. B) for sunlight hours, comms, and slope safety.</p>
+        </div>
+      </div>
+      <div class="slide-footer">Slide 3 / 7</div>
+    </section>
+
+    <!-- Slide 4: User Experience Walkthrough -->
+    <section class="slide" id="slide-4">
+      <div class="slide-badge">PRODUCT WALKTHROUGH</div>
+      <h2 class="slide-title">Actionable Telemetry for Rapid Decision-Making</h2>
+      <div class="flow-container">
+        <div class="step-card">
+          <span class="step-num">1</span>
+          <h4>Select Landing Site</h4>
+          <p>Choose from 12 curated Artemis III, CLPS, and ISRO sites or input custom coordinates.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-card">
+          <span class="step-num">2</span>
+          <h4>Evaluate Horizon Mask</h4>
+          <p>Instant LOLA 360° terrain elevation polygon calculation showing terrain shadow ingress.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-card">
+          <span class="step-num">3</span>
+          <h4>Isolate Golden Windows</h4>
+          <p>Pinpoint simultaneous sunlight AND DTE comm hours; export JPL Horizons-compatible CSV/JSON.</p>
+        </div>
+      </div>
+      <div class="kpi-banner">
+        <span>⏱️ <strong>Live Countdown Clocks:</strong> Hours to Next Sunset • Sunrise • Earthset • Earthrise</span>
+      </div>
+      <div class="slide-footer">Slide 4 / 7</div>
+    </section>
+
+    <!-- Slide 5: Scientific Validity & Grounded Data -->
+    <section class="slide" id="slide-5">
+      <div class="slide-badge">SCIENTIFIC RIGOR</div>
+      <h2 class="slide-title">Grounded in NASA & CSA Open Planetary Data</h2>
+      <div class="data-grid">
+        <div class="data-pill"><strong>NASA LOLA (LRO):</strong> Gridded digital elevation models for 360° horizon mask profiling</div>
+        <div class="data-pill"><strong>JPL Horizons:</strong> Topocentric ephemeris calibration & optical libration amplitudes</div>
+        <div class="data-pill"><strong>LROC QuickMap & Moon Trek:</strong> High-resolution optical morphology and slope verification</div>
+        <div class="data-pill"><strong>CSA Moon Exploration:</strong> Canadarm3 AI robotics and Lunar Utility Vehicle operational constraints</div>
+      </div>
+      <div class="equation-bar">
+        $$\text{Power (Vertical Mast)} \propto S_0 \cdot \cos(\text{elevation}_{\odot}) \quad\mid\quad \Delta \text{Libration}_{\text{lon}} = \pm 7.90^\circ, \; \Delta \text{Libration}_{\text{lat}} = \pm 6.68^\circ$$
+      </div>
+      <div class="slide-footer">Slide 5 / 7</div>
+    </section>
+
+    <!-- Slide 6: Dual Accessibility -->
+    <section class="slide" id="slide-6">
+      <div class="slide-badge">ACCESSIBILITY</div>
+      <h2 class="slide-title">Aerospace Precision Meets Public Inspiration</h2>
+      <div class="content-split">
+        <div class="card">
+          <h3>🛰️ Mission Planner Mode</h3>
+          <p>Engineered for mission architects: raw topocentric coordinates, array efficiencies, sub-solar points, countdown hours, and CSV export.</p>
+        </div>
+        <div class="card">
+          <h3>🎓 Educator & Public Explorer Mode</h3>
+          <p>Curated science cards translating complex orbital physics—1.54° tilt, cryogenic cold traps, and Canadian robotics—into plain language.</p>
+        </div>
+      </div>
+      <div class="quote-box">
+        Zero logins. Zero paywalls. Zero install dependencies. Built purely on standard modern Web APIs.
+      </div>
+      <div class="slide-footer">Slide 6 / 7</div>
+    </section>
+
+    <!-- Slide 7: Vision & Future Impact -->
+    <section class="slide" id="slide-7">
+      <div class="slide-badge">IMPACT & ROADMAP</div>
+      <h2 class="slide-title">Illuminating the Future of Lunar Exploration</h2>
+      <div class="three-col">
+        <div class="card mini">
+          <h4>Artemis Campaign</h4>
+          <p>Enabling EVA route planning, habitat siting, and emergency power contingency windows.</p>
+        </div>
+        <div class="card mini">
+          <h4>CLPS Commercial Rovers</h4>
+          <p>Optimizing battery conservation, drill deployment, and communication passes.</p>
+        </div>
+        <div class="card mini">
+          <h4>Global Lunar Science</h4>
+          <p>Open access tool for universities, educators, and emerging space agencies worldwide.</p>
+        </div>
+      </div>
+      <div class="links-card">
+        <div><strong>Public GitHub Repository:</strong> github.com/&lt;user&gt;/selenesight-spaceapps-2026</div>
+        <div><strong>Live Application URL:</strong> &lt;user&gt;.github.io/selenesight-spaceapps-2026/</div>
+      </div>
+      <div class="slide-footer">Slide 7 / 7 • Thank You, NASA Space Apps 2026 Judges!</div>
+    </section>
+
+  </div>
+
+  <div class="nav-controls">
+    <button id="prevBtn" type="button">← Previous</button>
+    <span id="slideIndicator">1 / 7</span>
+    <button id="nextBtn" type="button">Next →</button>
+  </div>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 7;
+    const slides = document.querySelectorAll('.slide');
+    const indicator = document.getElementById('slideIndicator');
+
+    function showSlide(n) {
+      if (n < 1) n = 1;
+      if (n > totalSlides) n = totalSlides;
+      currentSlide = n;
+      slides.forEach((s, idx) => {
+        s.classList.toggle('active', idx === currentSlide - 1);
+      });
+      indicator.textContent = `${currentSlide} / ${totalSlides}`;
+    }
+
+    document.getElementById('prevBtn').addEventListener('click', () => showSlide(currentSlide - 1));
+    document.getElementById('nextBtn').addEventListener('click', () => showSlide(currentSlide + 1));
+
+    // Keyboard Navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        showSlide(currentSlide + 1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        showSlide(currentSlide - 1);
+      } else if (e.key === 'Home') {
+        showSlide(1);
+      } else if (e.key === 'End') {
+        showSlide(totalSlides);
+      }
+    });
+
+    // Touch Swipe Navigation for Mobile/Tablet Judging
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const deck = document.getElementById('deckContainer');
+
+    deck.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    deck.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    }, { passive: true });
+
+    function handleSwipe() {
+      const threshold = 40;
+      if (touchEndX < touchStartX - threshold) {
+        showSlide(currentSlide + 1); // Swipe Left -> Next
+      } else if (touchEndX > touchStartX + threshold) {
+        showSlide(currentSlide - 1); // Swipe Right -> Prev
+      }
+    }
+  </script>
+</body>
+</html>
