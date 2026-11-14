@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SeleneSight — Lunar South Pole Ephemeris & Telemetry System</title>
+  <meta name="description" content="Topocentric lunar south pole ephemeris calculation system. Evaluates solar grazing angles, direct-to-earth visibility, and photovoltaic power conversion.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%230a0b0e'/><circle cx='16' cy='16' r='11' fill='none' stroke='%23f59e0b' stroke-width='2'/><circle cx='16' cy='16' r='3' fill='%2310b981'/><line x1='16' y1='2' x2='16' y2='30' stroke='%23f59e0b' stroke-width='1' stroke-opacity='0.4'/><line x1='2' y1='16' x2='30' y2='16' stroke='%23f59e0b' stroke-width='1' stroke-opacity='0.4'/></svg>">
+  <style>
+    /* ═════════════════════════════════════════════════════════════════════════
+       SeleneSight Aerospace Mission Control Design System
+       Theme: Lunar Basalt & Solar Grazing Amber (Strictly Zero Blue)
+       ═════════════════════════════════════════════════════════════════════════ */
+    :root {
+      /* Base Lunar Basalt Palette */
+      --color-basalt-black: #08090c;
+      --color-basalt-surface: #101217;
+      --color-basalt-card: #151821;
+      --color-basalt-card-hover: #1c202c;
+      --color-basalt-border: #232734;
+      --color-basalt-border-subtle: rgba(255, 255, 255, 0.06);
+
+      /* Solar Grazing Amber & Sunlight Gold */
+      --color-solar-primary: #f59e0b;
+      --color-solar-hover: #d97706;
+      --color-solar-light: #fbbf24;
+      --color-solar-surface: rgba(245, 158, 11, 0.12);
+      --color-solar-border: rgba(245, 158, 11, 0.35);
+
+      /* Communication / Line-of-Sight Phosphor Green */
+      --color-comm-primary: #10b981;
+      --color-comm-light: #34d399;
+      --color-comm-surface: rgba(16, 185, 129, 0.12);
+      --color-comm-border: rgba(16, 185, 129, 0.35);
+
+      /* Crater Shadow & PSR Hazard Oxide Crimson */
+      --color-hazard-primary: #ef4444;
+      --color-hazard-surface: rgba(239, 68, 68, 0.12);
+      --color-hazard-border: rgba(239, 68, 68, 0.35);
+
+      /* Lunar Titanium Typography */
+      --color-text-high: #f3f4f6;
+      --color-text-medium: #9ca3af;
+      --color-text-low: #6b7280;
+
+      /* Typefaces */
+      --font-stack-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-stack-mono: ui-monospace, SFMono-Regular, "Roboto Mono", Menlo, Monaco, Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--color-basalt-black);
+      color: var(--color-text-high);
+      font-family: var(--font-stack-mono);
+      font-size: 13px;
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Header Command Bar ── */
+    .app-header {
+      background: var(--color-basalt-surface);
+      border-bottom: 1px solid var(--color-basalt-border);
+      padding: 0 1.5rem;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 26px;
+      height: 26px;
+      border-radius: 4px;
+      background: linear-gradient(135deg, var(--color-solar-primary), var(--color-solar-hover));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 12px;
+      color: #08090c;
+      letter-spacing: -0.05em;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+    }
+
+    .brand-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--color-text-high);
+      letter-spacing: -0.01em;
+    }
+
+    .brand-tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: var(--color-solar-surface);
+      color: var(--color-solar-light);
+      border: 1px solid var(--color-solar-border);
+      font-family: var(--font-stack-mono);
+      letter-spacing: 0.04em;
+    }
+
+    .nav-tabs {
+      display: flex;
+      height: 56px;
+    }
+
+    .tab-item {
+      display: flex;
+      align-items: center;
+      padding: 0 1rem;
+      color: var(--color-text-medium);
+      font-size: 12.5px;
+      font-weight: 500;
+      text-decoration: none;
+      border: none;
+      background: none;
+      cursor: pointer;
+      position: relative;
+      transition: color 0.15s ease;
+    }
+
+    .tab-item:hover {
+      color: var(--color-text-high);
+    }
+
+    .tab-item.active {
+      color: var(--color-solar-light);
+      font-weight: 600;
+    }
+
+    .tab-item.active::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2.5px;
+      background: var(--color-solar-primary);
+      border-radius: 2px 2px 0 0;
+      box-shadow: 0 -1px 8px rgba(245, 158, 11, 0.4);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* ── Precision Form Controls ── */
+    .control-select {
+      background: var(--color-basalt-black);
+      border: 1px solid var(--color-basalt-border);
+      color: var(--color-text-high);
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: var(--font-stack-mono);
+      outline: none;
+      cursor: pointer;
+      height: 32px;
+      transition: border-color 0.15s;
+    }
+
+    .control-select:focus {
+      border-color: var(--color-solar-primary);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      font-family: var(--font-stack-mono);
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-solar {
+      background: var(--color-solar-primary);
+      color: #08090c;
+      font-weight: 600;
+    }
+
+    .btn-solar:hover {
+      background: var(--color-solar-light);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border-color: var(--color-basalt-border);
+      color: var(--color-text-medium);
+    }
+
+    .btn-outline:hover {
+      background: var(--color-basalt-card-hover);
+      color: var(--color-text-high);
+      border-color: var(--color-text-low);
+    }
+
+    .btn-sm {
+      height: 26px;
+      padding: 0 8px;
+      font-size: 11px;
+    }
+
+    .btn-toggle.active {
+      background: var(--color-solar-surface);
+      color: var(--color-solar-light);
+      border-color: var(--color-solar-border);
+    }
+
+    /* ── Main Dashboard Container ── */
+    .app-main {
+      flex: 1;
+      padding: 1.25rem 1.5rem;
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    /* Grid Layouts */
+    .telemetry-dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+
+    .card {
+      background: var(--color-basalt-card);
+      border: 1px solid var(--color-basalt-border);
+      border-radius: 6px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--color-basalt-border-subtle);
+    }
+
+    .card-title {
+      font-size: 11.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-medium);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Avionics KPI Cards */
+    .kpi-card {
+      padding: 1rem;
+      border-top: 3px solid var(--color-basalt-border);
+    }
+
+    .kpi-card.kpi-solar { border-top-color: var(--color-solar-primary); }
+    .kpi-card.kpi-comm { border-top-color: var(--color-comm-primary); }
+    .kpi-card.kpi-dual { border-top-color: var(--color-comm-light); }
+    .kpi-card.kpi-viability { border-top-color: var(--color-solar-light); }
+
+    .kpi-label {
+      font-size: 10.5px;
+      color: var(--color-text-low);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .kpi-value {
+      font-family: var(--font-stack-mono);
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--color-text-high);
+      margin: 4px 0 2px 0;
+    }
+
+    .kpi-subtext {
+      font-size: 11px;
+      color: var(--color-text-medium);
+      font-family: var(--font-stack-mono);
+    }
+
+    /* Span Layout Utilities */
+    .span-2 { grid-column: span 2; }
+    .span-4 { grid-column: span 4; }
+
+    /* Precision Telemetry Data Table */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-stack-mono);
+      font-size: 11.5px;
+    }
+
+    .data-table th, .data-table td {
+      padding: 6px 8px;
+      text-align: left;
+      border-bottom: 1px solid var(--color-basalt-border-subtle);
+    }
+
+    .data-table th {
+      color: var(--color-text-low);
+      font-weight: 600;
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .data-table td.numeric {
+      text-align: right;
+    }
+
+    .badge-status {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-ok { background: var(--color-comm-surface); color: var(--color-comm-light); border: 1px solid var(--color-comm-border); }
+    .badge-warn { background: var(--color-solar-surface); color: var(--color-solar-light); border: 1px solid var(--color-solar-border); }
+    .badge-alert { background: var(--color-hazard-surface); color: var(--color-hazard-primary); border: 1px solid var(--color-hazard-border); }
+
+    /* Instrument Canvas Viewport */
+    .canvas-container {
+      background: #08090c;
+      border: 1px solid var(--color-basalt-border-subtle);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .canvas-container canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    /* Synodic Scrubber Bar */
+    .scrubber-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .scrubber-controls-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .playback-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .scrubber-range {
+      width: 100%;
+      height: 4px;
+      background: var(--color-basalt-border);
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+      border-radius: 2px;
+    }
+
+    .scrubber-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--color-solar-primary);
+      cursor: pointer;
+      border: 2px solid #08090c;
+      box-shadow: 0 0 6px rgba(245, 158, 11, 0.5);
+    }
+
+    .scrubber-range::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--color-solar-primary);
+      cursor: pointer;
+      border: 2px solid #08090c;
+    }
+
+    /* Comparative Differential Matrix */
+    .comparator-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.2fr;
+      gap: 1rem;
+    }
+
+    .delta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--color-basalt-border-subtle);
+      font-size: 12px;
+    }
+
+    .delta-val {
+      font-family: var(--font-stack-mono);
+      font-weight: 600;
+    }
+
+    .delta-pos { color: var(--color-comm-light); }
+    .delta-neg { color: var(--color-hazard-primary); }
+    .delta-zero { color: var(--color-text-low); }
+
+    /* Planetary Deep Links Grid */
+    .portal-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .portal-card {
+      background: var(--color-basalt-surface);
+      border: 1px solid var(--color-basalt-border);
+      border-radius: 6px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .portal-card h4 {
+      font-size: 13px;
+      color: var(--color-solar-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .portal-card p {
+      font-size: 12px;
+      color: var(--color-text-medium);
+      line-height: 1.5;
+    }
+
+    .portal-card a {
+      color: var(--color-solar-primary);
+      text-decoration: none;
+      font-size: 11.5px;
+      font-weight: 600;
+      margin-top: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .portal-card a:hover {
+      color: var(--color-solar-light);
+      text-decoration: underline;
+    }
+
+    /* ── Command Footer ── */
+    .app-footer {
+      background: var(--color-basalt-surface);
+      border-top: 1px solid var(--color-basalt-border);
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--color-text-low);
+      margin-top: auto;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.25rem;
+    }
+
+    .footer-links a {
+      color: var(--color-solar-primary);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover {
+      text-decoration: underline;
+    }
+
+    /* ── Responsive Viewports ── */
+    @media (max-width: 1100px) {
+      .telemetry-dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+      .span-2 { grid-column: span 2; }
+      .span-4 { grid-column: span 2; }
+      .comparator-grid { grid-template-columns: 1fr; }
+      .portal-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 700px) {
+      .telemetry-dashboard-grid { grid-template-columns: 1fr; }
+      .span-2, .span-4 { grid-column: span 1; }
+      .app-header { flex-direction: column; height: auto; padding: 0.5rem 1rem; gap: 0.5rem; }
+      .header-left { width: 100%; justify-content: space-between; }
+      .nav-tabs { width: 100%; overflow-x: auto; height: 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Command Header Bar -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="brand-group">
+        <div class="brand-mark">SS</div>
+        <div>
+          <span class="brand-title">SeleneSight</span>
+          <span class="brand-tag">LUNAR EPHEMERIS</span>
+        </div>
+      </div>
+
+      <nav class="nav-tabs" id="navTabs">
+        <button class="tab-item active" data-tab="telemetry">[1] Mission Telemetry</button>
+        <button class="tab-item" data-tab="ephemeris">[2] Trajectory Analysis</button>
+        <button class="tab-item" data-tab="comparator">[3] Scenario Comparator</button>
+        <button class="tab-item" data-tab="portals">[4] Verified Planetary Portals</button>
+      </nav>
+    </div>
+
+    <div class="header-right">
+      <select id="siteSelector" class="control-select" aria-label="Select landing site"></select>
+      <select id="arrayTypeSelect" class="control-select" aria-label="Select solar array configuration">
+        <option value="vertical_mast">Vertical Mast Array (cos(el))</option>
+        <option value="sun_tracking">2-Axis Sun Tracking (100%)</option>
+        <option value="horizontal_deck">Horizontal Deck Array (sin(el))</option>
+      </select>
+      <button id="btnExportCSV" class="btn btn-outline" title="Export ephemeris in JPL Horizons format">Export CSV</button>
+      <button id="btnExportJSON" class="btn btn-outline" title="Export raw trajectory in JSON format">Export JSON</button>
+    </div>
+  </header>
+
+  <!-- Main Viewport -->
+  <main class="app-main">
+
+    <!-- TAB 1: Mission Telemetry -->
+    <section id="tab-telemetry" class="tab-panel active">
+      <div class="telemetry-dashboard-grid">
+
+        <!-- KPI 1 -->
+        <div class="card kpi-card kpi-solar">
+          <div class="kpi-label">Solar Illumination Window</div>
+          <div class="kpi-value" id="kpiSunlitPct">--%</div>
+          <div class="kpi-subtext" id="kpiSunlitHours">-- / 708 hrs</div>
+        </div>
+
+        <!-- KPI 2 -->
+        <div class="card kpi-card kpi-comm">
+          <div class="kpi-label">Direct-to-Earth (DTE) Comm</div>
+          <div class="kpi-value" id="kpiDtePct">--%</div>
+          <div class="kpi-subtext" id="kpiDteHours">-- / 708 hrs</div>
+        </div>
+
+        <!-- KPI 3 -->
+        <div class="card kpi-card kpi-dual">
+          <div class="kpi-label">Simultaneous Sun + Comm Window</div>
+          <div class="kpi-value" id="kpiDualPct">--%</div>
+          <div class="kpi-subtext" id="kpiDualHours">-- / 708 hrs</div>
+        </div>
+
+        <!-- KPI 4 -->
+        <div class="card kpi-card kpi-viability">
+          <div class="kpi-label">Site Viability Index</div>
+          <div class="kpi-value" id="kpiViabilityScore">-- / 100</div>
+          <div class="kpi-subtext" id="kpiSlopeGrade">Slope: -- deg</div>
+        </div>
+
+        <!-- Canvas: 708-Hour Mathematical Trajectory Curves -->
+        <div class="card span-2">
+          <div class="card-header">
+            <span class="card-title">Synodic Solar & Earth Elevation Trajectory (0–708 hrs)</span>
+            <span class="brand-tag" id="currentEpochBadge">T+0h</span>
+          </div>
+          <div class="canvas-container">
+            <canvas id="telemetryCurveCanvas" width="700" height="340"></canvas>
+          </div>
+        </div>
+
+        <!-- Real-Time State Readout Table -->
+        <div class="card span-2">
+          <div class="card-header">
+            <span class="card-title">Topocentric State Vector Matrix</span>
+            <span class="brand-tag">INSTANTANEOUS</span>
+          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Vector Parameter</th>
+                <th>Calculated Value</th>
+                <th>Threshold / Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Sun Elevation</td>
+                <td class="numeric" id="cellSunEl">-- deg</td>
+                <td id="statusSunLit"><span class="badge-status badge-warn">EVALUATING</span></td>
+              </tr>
+              <tr>
+                <td>Sun Azimuth (Clockwise from N)</td>
+                <td class="numeric" id="cellSunAz">-- deg</td>
+                <td>Local Meridian</td>
+              </tr>
+              <tr>
+                <td>LOLA Horizon Mask Threshold</td>
+                <td class="numeric" id="cellSunMask">-- deg</td>
+                <td>Crater Rim Limit</td>
+              </tr>
+              <tr>
+                <td>Photovoltaic Efficiency</td>
+                <td class="numeric" id="cellArrayEff">--%</td>
+                <td id="cellSolarFlux">-- W/m²</td>
+              </tr>
+              <tr>
+                <td>Earth Elevation</td>
+                <td class="numeric" id="cellEarthEl">-- deg</td>
+                <td id="statusEarthVis"><span class="badge-status badge-warn">EVALUATING</span></td>
+              </tr>
+              <tr>
+                <td>Optical Libration (Lat / Lon)</td>
+                <td class="numeric" id="cellLibration">-- / -- deg</td>
+                <td>Draconic / Anomalistic</td>
+              </tr>
+              <tr>
+                <td>Next Sunset Transition</td>
+                <td class="numeric" id="cellNextSunset">-- hrs</td>
+                <td>Countdown</td>
+              </tr>
+              <tr>
+                <td>Next Earthset Transition</td>
+                <td class="numeric" id="cellNextEarthset">-- hrs</td>
+                <td>Countdown</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Timeline Scrubber Control Bar -->
+        <div class="card span-4 scrubber-panel">
+          <div class="scrubber-controls-row">
+            <div class="playback-group">
+              <button id="btnPlayPause" class="btn btn-solar btn-sm" title="Toggle simulation animation">Play</button>
+              <button id="btnStepBack" class="btn btn-outline btn-sm" title="Step backward 1 hour">&lt; -1h</button>
+              <button id="btnStepForward" class="btn btn-outline btn-sm" title="Step forward 1 hour">+1h &gt;</button>
+              <button id="btnLoop" class="btn btn-outline btn-sm btn-toggle active" title="Synodic cycle auto-loop active">Loop</button>
+              <button id="btnSpeed1" class="btn btn-outline btn-sm btn-toggle active">1x</button>
+              <button id="btnSpeed3" class="btn btn-outline btn-sm btn-toggle">3x</button>
+              <button id="btnSpeed6" class="btn btn-outline btn-sm btn-toggle">6x</button>
+            </div>
+            <div style="font-family: var(--font-stack-mono); font-size: 11px; color: var(--color-text-medium);">
+              Hour Offset: <strong id="lblHourOffset" style="color: var(--color-solar-light);">0</strong> / 708 hrs
+            </div>
+          </div>
+          <input type="range" id="timelineSlider" class="scrubber-range" min="0" max="708" value="0">
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 2: Trajectory Analysis -->
+    <section id="tab-ephemeris" class="tab-panel">
+      <div class="card" style="margin-bottom: 1rem;">
+        <div class="card-header">
+          <span class="card-title">Topocentric Skyplot & Panorama</span>
+          <div class="playback-group">
+            <button id="btnViewPolar" class="btn btn-outline btn-sm btn-toggle active">Polar Reticle (360° Dome)</button>
+            <button id="btnViewLinear" class="btn btn-outline btn-sm btn-toggle">Cartesian Panorama (0°–360°)</button>
+          </div>
+        </div>
+        <div class="canvas-container">
+          <canvas id="skyplotCanvas" width="960" height="520"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: Scenario Comparator -->
+    <section id="tab-comparator" class="tab-panel">
+      <div class="comparator-grid">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Scenario A (Reference Site)</span>
+          </div>
+          <select id="selectScenarioA" class="control-select" style="margin-bottom: 10px;"></select>
+          <div id="statsScenarioA"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Scenario B (Candidate Site)</span>
+          </div>
+          <select id="selectScenarioB" class="control-select" style="margin-bottom: 10px;"></select>
+          <div id="statsScenarioB"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Comparative Trade-Off Delta (B minus A)</span>
+          </div>
+          <div id="deltaResults"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: Verified Planetary Portals -->
+    <section id="tab-portals" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Integrated Planetary Resources & Space Agency Standards</span>
+        </div>
+        <p style="color: var(--color-text-medium); line-height: 1.6; margin-bottom: 1rem;">
+          SeleneSight links directly with official planetary data systems from NASA, JPL, and the Canadian Space Agency. All topocentric elevation algorithms are verified against LOLA digital elevation models and JPL Horizons ephemeris outputs.
+        </p>
+
+        <div class="portal-grid">
+          <!-- Portal 1: QuickMap -->
+          <div class="portal-card">
+            <h4>NASA LROC QuickMap <span class="badge-status badge-ok">LRO / LOLA</span></h4>
+            <p>Interactive planetary GIS hosting Narrow Angle Camera (NAC) mosaics, LOLA topography, and slope hazard distributions for all 12 candidate Artemis polar sites.</p>
+            <a id="linkQuickMap" href="https://quickmap.lroc.asu.edu/" target="_blank" rel="noopener">Open Active Site in LROC QuickMap →</a>
+          </div>
+
+          <!-- Portal 2: Moon Trek -->
+          <div class="portal-card">
+            <h4>NASA Moon Trek <span class="badge-status badge-ok">JPL / NASA</span></h4>
+            <p>Coordinate-anchored 3D terrain viewer providing digital elevation profiles, crater rim crest elevations, and rover traverse route planning.</p>
+            <a id="linkMoonTrek" href="https://trek.nasa.gov/moon/" target="_blank" rel="noopener">Open Active Site in NASA Moon Trek →</a>
+          </div>
+
+          <!-- Portal 3: JPL Horizons -->
+          <div class="portal-card">
+            <h4>JPL Horizons On-Line Ephemeris <span class="badge-status badge-ok">NASA SSD</span></h4>
+            <p>Solar System Dynamics benchmark verifying sub-solar drift (0.5079°/hr), 1 AU solar irradiance (1,361.0 W/m²), and optical libration amplitudes (±6.68° lat, ±7.90° lon).</p>
+            <a id="linkHorizons" href="https://ssd.jpl.nasa.gov/horizons/app.html#/" target="_blank" rel="noopener">Access JPL Horizons Web App →</a>
+          </div>
+
+          <!-- Portal 4: CSA Moon Exploration -->
+          <div class="portal-card">
+            <h4>Canadian Space Agency (CSA) <span class="badge-status badge-ok">Canadarm3 / LUV</span></h4>
+            <p>Operational partner modeling lunar south pole power requirements for the Canadian Lunar Utility Rover and Gateway NRHO communication passes serviced by Canadarm3.</p>
+            <a href="https://www.asc-csa.gc.ca/eng/astronomy/moon-exploration/" target="_blank" rel="noopener">Review CSA Moon Exploration Brief →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Command Footer -->
+  <footer class="app-footer">
+    <div>
+      <span>SeleneSight Ephemeris System</span>
+      <span style="margin: 0 8px;">|</span>
+      <span>Abhijith B S (Team Lead & Full-Stack Architect)</span>
+      <span style="margin: 0 8px;">|</span>
+      <span>NASA Space Apps Challenge 2026</span>
+    </div>
+    <div class="footer-links">
+      <a href="https://github.com/Abhijithbs-dev/NASA_Space_Apps_Challenge_2026.git" target="_blank" rel="noopener">GitHub: Abhijithbs-dev/NASA_Space_Apps_Challenge_2026</a>
+      <a href="https://ssd.jpl.nasa.gov/horizons/" target="_blank" rel="noopener">JPL Horizons Reference</a>
+    </div>
+  </footer>
+
+  <!-- Master Core Orchestrator -->
+  <script type="module">
+    import { InterfaceContract } from './src/core/interfaceContract.js';
+    import { ephemerisEngine } from './src/core/ephemerisEngine.js';
+    import { appState } from './src/core/appState.js';
+
+    // Expose for runtime telemetry inspection and browser evaluation
+    window.InterfaceContract = InterfaceContract;
+    window.ephemerisEngine = ephemerisEngine;
+    window.appState = appState;
+
+    /**
+     * Renders mathematical trajectory curves (Solar/Earth elevation vs time) on canvas.
+     * Theme: Solar Grazing Amber & Phosphor Avionics Green (Zero Blue).
+     * @param {!HTMLCanvasElement} canvas
+     * @param {!Object} cycleData
+     * @param {number} currentHour
+     */
+    function renderTrajectoryCurveCanvas(canvas, cycleData, currentHour) {
+      if (!canvas || !cycleData || !cycleData.steps) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+      const padL = 40;
+      const padR = 20;
+      const padT = 20;
+      const padB = 30;
+      const plotW = w - padL - padR;
+      const plotH = h - padT - padB;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Basalt background
+      ctx.fillStyle = '#08090c';
+      ctx.fillRect(padL, padT, plotW, plotH);
+
+      const elMin = -8;
+      const elMax = 16;
+      const yForEl = (el) => padT + plotH * (1.0 - (el - elMin) / (elMax - elMin));
+      const xForHour = (hr) => padL + (hr / 708.0) * plotW;
+
+      // Elevation horizontal grid
+      ctx.lineWidth = 1;
+      for (let el = -6; el <= 14; el += 2) {
+        const y = yForEl(el);
+        ctx.strokeStyle = el === 0 ? 'rgba(245, 158, 11, 0.45)' : 'rgba(255, 255, 255, 0.05)';
+        ctx.beginPath();
+        ctx.moveTo(padL, y);
+        ctx.lineTo(padL + plotW, y);
+        ctx.stroke();
+
+        ctx.fillStyle = el === 0 ? '#f59e0b' : '#6b7280';
+        ctx.font = '10px ui-monospace, SFMono-Regular, monospace';
+        ctx.textAlign = 'right';
+        ctx.fillText(`${el}°`, padL - 6, y + 3);
+      }
+
+      // Vertical time grid (every 100 hours)
+      for (let hr = 0; hr <= 708; hr += 100) {
+        const x = xForHour(hr);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+        ctx.beginPath();
+        ctx.moveTo(x, padT);
+        ctx.lineTo(x, padT + plotH);
+        ctx.stroke();
+
+        ctx.fillStyle = '#6b7280';
+        ctx.font = '10px ui-monospace, SFMono-Regular, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(`T+${hr}`, x, padT + plotH + 16);
+      }
+
+      // Plot boundary clipping
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(padL, padT, plotW, plotH);
+      ctx.clip();
+
+      const steps = cycleData.steps;
+
+      // 1. Draw Solar Elevation Curve (Solar Grazing Amber)
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 1.75;
+      ctx.beginPath();
+      for (let i = 0; i < steps.length; i++) {
+        const x = xForHour(steps[i].hourOffset);
+        const y = yForEl(steps[i].sunElDeg);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // 2. Draw Earth Elevation Curve (Phosphor Avionics Green)
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 1.75;
+      ctx.beginPath();
+      for (let i = 0; i < steps.length; i++) {
+        const x = xForHour(steps[i].hourOffset);
+        const y = yForEl(steps[i].earthElDeg);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // 3. Draw LOLA Crater-Rim Mask Threshold (Oxide Crimson dashed)
+      ctx.strokeStyle = 'rgba(239, 68, 68, 0.85)';
+      ctx.lineWidth = 1.25;
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath();
+      for (let i = 0; i < steps.length; i++) {
+        const x = xForHour(steps[i].hourOffset);
+        const y = yForEl(steps[i].sunHorizonMaskDeg);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // 4. Current Time Needle
+      const needleX = xForHour(currentHour);
+      ctx.strokeStyle = '#f3f4f6';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(needleX, padT);
+      ctx.lineTo(needleX, padT + plotH);
+      ctx.stroke();
+
+      ctx.restore();
+
+      // Header Legend with protective backdrop pill
+      const legX = padL + 10;
+      const legY = padT + 6;
+      ctx.fillStyle = 'rgba(16, 18, 23, 0.90)';
+      ctx.fillRect(legX, legY, 355, 18);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.strokeRect(legX, legY, 355, 18);
+
+      ctx.font = '10.5px ui-monospace, SFMono-Regular, monospace';
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillText('— Sun Elevation', legX + 8, legY + 13);
+      ctx.fillStyle = '#10b981';
+      ctx.fillText('— Earth Elevation', legX + 115, legY + 13);
+      ctx.fillStyle = '#ef4444';
+      ctx.fillText('-- LOLA Crater Mask', legX + 230, legY + 13);
+    }
+
+    /**
+     * Renders topocentric skyplot or linear panorama on canvas.
+     */
+    function renderSkyplotCanvas(canvas, cycleData, currentHour, viewMode) {
+      if (!canvas || !cycleData || !cycleData.steps || cycleData.steps.length === 0) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+      const steps = cycleData.steps;
+      const step = steps[currentHour] || steps[0];
+
+      ctx.clearRect(0, 0, w, h);
+
+      if (viewMode === 'polar') {
+        const cx = w / 2;
+        const cy = h / 2;
+        const maxR = Math.min(w, h) * 0.42;
+
+        // Background
+        ctx.fillStyle = '#08090c';
+        ctx.beginPath();
+        ctx.arc(cx, cy, maxR, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Concentric elevation rings
+        [0, 5, 15, 45].forEach((el) => {
+          const r = maxR * (1.0 - (el / 90.0));
+          ctx.strokeStyle = el === 0 ? 'rgba(245, 158, 11, 0.4)' : 'rgba(255, 255, 255, 0.08)';
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.stroke();
+
+          ctx.fillStyle = el === 0 ? '#f59e0b' : '#6b7280';
+          ctx.font = '10px ui-monospace, SFMono-Regular, monospace';
+          ctx.fillText(`${el}°`, cx + 4, cy - r + 11);
+        });
+
+        // Azimuth spokes (30° step matching 12 LOLA sectors)
+        for (let az = 0; az < 360; az += 30) {
+          const rad = (az - 90) * (Math.PI / 180);
+          ctx.strokeStyle = (az % 90 === 0) ? 'rgba(255, 255, 255, 0.16)' : 'rgba(255, 255, 255, 0.08)';
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.lineTo(cx + maxR * Math.cos(rad), cy + maxR * Math.sin(rad));
+          ctx.stroke();
+
+          // Cardinal direction & azimuth degree labels
+          const labelR = maxR + 14;
+          const lx = cx + labelR * Math.cos(rad);
+          const ly = cy + labelR * Math.sin(rad);
+
+          let text;
+          if (az === 0) text = 'N 000°';
+          else if (az === 90) text = 'E 090°';
+          else if (az === 180) text = 'S 180°';
+          else if (az === 270) text = 'W 270°';
+          else text = `${String(az).padStart(3, '0')}°`;
+
+          ctx.font = '9.5px ui-monospace, SFMono-Regular, monospace';
+          ctx.fillStyle = (az % 90 === 0) ? '#f3f4f6' : '#6b7280';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(text, lx, ly);
+        }
+
+        // LOLA Crater-Rim Mask (Oxide Crimson obstructed annular region outside rim: r_mask <= r <= maxR)
+        if (cycleData.site && Array.isArray(cycleData.site.horizonProfile)) {
+          const prof = cycleData.site.horizonProfile;
+          // Shading obstructed annular region
+          ctx.beginPath();
+          ctx.arc(cx, cy, maxR, -Math.PI / 2, Math.PI * 1.5, false);
+          for (let a = 360; a >= 0; a -= 2) {
+            const maskEl = ephemerisEngine.interpolateHorizon(prof, a);
+            const r = maxR * Math.max(0.0, 1.0 - (maskEl / 90.0));
+            const rad = (a - 90) * (Math.PI / 180);
+            const px = cx + r * Math.cos(rad);
+            const py = cy + r * Math.sin(rad);
+            ctx.lineTo(px, py);
+          }
+          ctx.closePath();
+          ctx.fillStyle = 'rgba(239, 68, 68, 0.20)';
+          ctx.fill();
+
+          // Prominent crater rim boundary stroke
+          ctx.beginPath();
+          for (let a = 0; a <= 360; a += 2) {
+            const maskEl = ephemerisEngine.interpolateHorizon(prof, a);
+            const r = maxR * Math.max(0.0, 1.0 - (maskEl / 90.0));
+            const rad = (a - 90) * (Math.PI / 180);
+            const px = cx + r * Math.cos(rad);
+            const py = cy + r * Math.sin(rad);
+            if (a === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+          }
+          ctx.closePath();
+          ctx.strokeStyle = 'rgba(239, 68, 68, 0.85)';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+
+        // Sun Orbit Track (Solar Amber dots)
+        ctx.fillStyle = 'rgba(245, 158, 11, 0.35)';
+        for (let i = 0; i < steps.length; i += 4) {
+          const s = steps[i];
+          const r = maxR * (1.0 - Math.max(0, s.sunElDeg) / 90.0);
+          const rad = (s.sunAzDeg - 90) * (Math.PI / 180);
+          ctx.beginPath();
+          ctx.arc(cx + r * Math.cos(rad), cy + r * Math.sin(rad), 1.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Earth Libration Loop (Avionics Green dots)
+        ctx.fillStyle = 'rgba(16, 185, 129, 0.4)';
+        for (let i = 0; i < steps.length; i += 4) {
+          const s = steps[i];
+          const r = maxR * (1.0 - Math.max(0, s.earthElDeg) / 90.0);
+          const rad = (s.earthAzDeg - 90) * (Math.PI / 180);
+          ctx.beginPath();
+          ctx.arc(cx + r * Math.cos(rad), cy + r * Math.sin(rad), 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Active Sun Marker with Gold Halo
+        const sunR = maxR * (1.0 - Math.max(0, step.sunElDeg) / 90.0);
+        const sunRad = (step.sunAzDeg - 90) * (Math.PI / 180);
+        ctx.fillStyle = '#f59e0b';
+        ctx.beginPath();
+        ctx.arc(cx + sunR * Math.cos(sunRad), cy + sunR * Math.sin(sunRad), 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.stroke();
+
+        // Active Earth Marker with Green Halo
+        const earthR = maxR * (1.0 - Math.max(0, step.earthElDeg) / 90.0);
+        const earthRad = (step.earthAzDeg - 90) * (Math.PI / 180);
+        ctx.fillStyle = '#10b981';
+        ctx.beginPath();
+        ctx.arc(cx + earthR * Math.cos(earthRad), cy + earthR * Math.sin(earthRad), 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.stroke();
+
+      } else {
+        // Cartesian Linear Panorama: X: Azimuth [0°, 360°], Y: Elevation [-10°, +45°]
+        const padL = 50;
+        const padR = 25;
+        const padT = 30;
+        const padB = 40;
+        const pW = w - padL - padR;
+        const pH = h - padT - padB;
+
+        // Basalt Black sky background
+        ctx.fillStyle = '#08090c';
+        ctx.fillRect(padL, padT, pW, pH);
+
+        const elMin = -10.0;
+        const elMax = 45.0;
+        const xForAz = (az) => padL + (az / 360.0) * pW;
+        const yForEl = (el) => padT + pH * (1.0 - (el - elMin) / (elMax - elMin));
+
+        // Horizontal elevation gridlines
+        const elGrid = [-10, 0, 10, 20, 30, 40];
+        ctx.lineWidth = 1;
+        for (const el of elGrid) {
+          const y = yForEl(el);
+          ctx.strokeStyle = el === 0 ? 'rgba(245, 158, 11, 0.45)' : 'rgba(255, 255, 255, 0.06)';
+          ctx.beginPath();
+          ctx.moveTo(padL, y);
+          ctx.lineTo(padL + pW, y);
+          ctx.stroke();
+
+          ctx.fillStyle = el === 0 ? '#f59e0b' : '#6b7280';
+          ctx.font = '10px ui-monospace, SFMono-Regular, monospace';
+          ctx.textAlign = 'right';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(`${el > 0 ? '+' : ''}${el}°`, padL - 6, y);
+        }
+
+        // Vertical azimuth gridlines (every 30° matching 12 LOLA sectors)
+        for (let az = 0; az <= 360; az += 30) {
+          const x = xForAz(az);
+          ctx.strokeStyle = (az % 90 === 0) ? 'rgba(255, 255, 255, 0.14)' : 'rgba(255, 255, 255, 0.05)';
+          ctx.beginPath();
+          ctx.moveTo(x, padT);
+          ctx.lineTo(x, padT + pH);
+          ctx.stroke();
+
+          let text;
+          if (az === 0) text = 'N 000°';
+          else if (az === 90) text = 'E 090°';
+          else if (az === 180) text = 'S 180°';
+          else if (az === 270) text = 'W 270°';
+          else if (az === 360) text = 'N 360°';
+          else text = `${String(az).padStart(3, '0')}°`;
+
+          ctx.fillStyle = (az % 90 === 0) ? '#f3f4f6' : '#6b7280';
+          ctx.font = '9.5px ui-monospace, SFMono-Regular, monospace';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'top';
+          ctx.fillText(text, x, padT + pH + 8);
+        }
+
+        // Clip plot viewport
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(padL, padT, pW, pH);
+        ctx.clip();
+
+        // LOLA Crater-Rim Horizon Profile & Shaded Terrain
+        if (cycleData.site && Array.isArray(cycleData.site.horizonProfile)) {
+          const prof = cycleData.site.horizonProfile;
+
+          // Shaded terrain below crater rim down to bottom
+          ctx.beginPath();
+          ctx.moveTo(padL, padT + pH);
+          for (let az = 0; az <= 360; az += 1) {
+            const maskEl = ephemerisEngine.interpolateHorizon(prof, az);
+            ctx.lineTo(xForAz(az), yForEl(maskEl));
+          }
+          ctx.lineTo(padL + pW, padT + pH);
+          ctx.closePath();
+          ctx.fillStyle = 'rgba(239, 68, 68, 0.18)';
+          ctx.fill();
+
+          // Stroke crater rim profile curve
+          ctx.beginPath();
+          for (let az = 0; az <= 360; az += 1) {
+            const maskEl = ephemerisEngine.interpolateHorizon(prof, az);
+            const x = xForAz(az);
+            const y = yForEl(maskEl);
+            if (az === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.strokeStyle = 'rgba(239, 68, 68, 0.85)';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+
+        // Sun Trajectory Trace (Solar Grazing Amber)
+        ctx.fillStyle = 'rgba(245, 158, 11, 0.35)';
+        for (let i = 0; i < steps.length; i += 3) {
+          const s = steps[i];
+          const x = xForAz(s.sunAzDeg);
+          const y = yForEl(s.sunElDeg);
+          ctx.beginPath();
+          ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Earth Trajectory Trace (Phosphor Avionics Green)
+        ctx.fillStyle = 'rgba(16, 185, 129, 0.40)';
+        for (let i = 0; i < steps.length; i += 3) {
+          const s = steps[i];
+          const x = xForAz(s.earthAzDeg);
+          const y = yForEl(s.earthElDeg);
+          ctx.beginPath();
+          ctx.arc(x, y, 2.0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Active Sun Marker with Gold Halo & Label
+        const sunX = xForAz(step.sunAzDeg);
+        const sunY = yForEl(step.sunElDeg);
+        ctx.fillStyle = '#f59e0b';
+        ctx.beginPath();
+        ctx.arc(sunX, sunY, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        ctx.font = '10px ui-monospace, SFMono-Regular, monospace';
+        ctx.fillStyle = '#fbbf24';
+        ctx.textAlign = sunX > padL + pW - 130 ? 'right' : 'left';
+        ctx.textBaseline = 'bottom';
+        const sunOffset = sunX > padL + pW - 130 ? -10 : 10;
+        ctx.fillText(`SUN [${step.sunAzDeg.toFixed(1)}°, ${step.sunElDeg.toFixed(1)}°]`, sunX + sunOffset, sunY - 4);
+
+        // Active Earth Marker with Green Halo & Label
+        const earthX = xForAz(step.earthAzDeg);
+        const earthY = yForEl(step.earthElDeg);
+        ctx.fillStyle = '#10b981';
+        ctx.beginPath();
+        ctx.arc(earthX, earthY, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        ctx.font = '10px ui-monospace, SFMono-Regular, monospace';
+        ctx.fillStyle = '#34d399';
+        ctx.textAlign = earthX > padL + pW - 140 ? 'right' : 'left';
+        ctx.textBaseline = 'top';
+        const earthOffset = earthX > padL + pW - 140 ? -10 : 10;
+        ctx.fillText(`EARTH [${step.earthAzDeg.toFixed(1)}°, ${step.earthElDeg.toFixed(1)}°]`, earthX + earthOffset, earthY + 8);
+
+        ctx.restore();
+
+        // Header Legend with protective backdrop pill
+        const legX = padL + 10;
+        const legY = padT + 6;
+        ctx.fillStyle = 'rgba(16, 18, 23, 0.90)';
+        ctx.fillRect(legX, legY, 355, 18);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+        ctx.strokeRect(legX, legY, 355, 18);
+
+        ctx.font = '10.5px ui-monospace, SFMono-Regular, monospace';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#f59e0b';
+        ctx.fillText('— Sun Trajectory', legX + 8, legY + 9);
+        ctx.fillStyle = '#10b981';
+        ctx.fillText('— Earth Libration', legX + 120, legY + 9);
+        ctx.fillStyle = '#ef4444';
+        ctx.fillText('-- LOLA Crater Rim', legX + 235, legY + 9);
+      }
+    }
+
+    /**
+     * Updates portal deep link URLs dynamically based on the active landing site.
+     * @param {!Object} site
+     */
+    function updatePortalLinks(site) {
+      if (!site) return;
+      const qm = document.getElementById('linkQuickMap');
+      const mt = document.getElementById('linkMoonTrek');
+      const hz = document.getElementById('linkHorizons');
+
+      if (qm) {
+        const d = 1.5;
+        const ext = `${(site.lon - d).toFixed(3)},${(site.lat - d).toFixed(3)},${(site.lon + d).toFixed(3)},${(site.lat + d).toFixed(3)}`;
+        qm.href = `https://quickmap.lroc.asu.edu/?extent=${ext}&proj=10&layers=nrbtLSF%2CLunar_LRO_LOLA_ClrShade_Global_128ppd%2CLunar_LRO_LROC_NAC_SouthPole85_10m`;
+      }
+
+      if (mt) {
+        mt.href = `https://trek.nasa.gov/moon/#v=0.1&x=${site.lon.toFixed(3)}&y=${site.lat.toFixed(3)}&z=6`;
+      }
+
+      if (hz) {
+        hz.href = 'https://ssd.jpl.nasa.gov/horizons/app.html#/';
+      }
+    }
+
+    // Bootstrap Master Ephemeris System
+    function bootstrap() {
+      // 1. Initialize State with canonical NASA candidate sites
+      const candidateSites = InterfaceContract.getMockSites();
+      appState.init(candidateSites);
+
+      // 2. Populate Site Dropdowns
+      const siteSelector = document.getElementById('siteSelector');
+      const selA = document.getElementById('selectScenarioA');
+      const selB = document.getElementById('selectScenarioB');
+      siteSelector.innerHTML = '';
+      if (selA) selA.innerHTML = '';
+      if (selB) selB.innerHTML = '';
+
+      appState.sites.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = `${s.name} (${s.elevM} m)`;
+        siteSelector.appendChild(opt);
+        if (selA) selA.appendChild(opt.cloneNode(true));
+        if (selB) selB.appendChild(opt.cloneNode(true));
+      });
+
+      if (selB && appState.sites.length > 1) {
+        selB.selectedIndex = 1;
+        appState.setScenarioSite('B', appState.sites[1].id);
+      }
+
+      // 3. Event Listeners
+      siteSelector.addEventListener('change', (e) => appState.setActiveSite(e.target.value));
+      document.getElementById('arrayTypeSelect').addEventListener('change', (e) => appState.setArrayType(e.target.value));
+
+      if (selA) selA.addEventListener('change', (e) => appState.setScenarioSite('A', e.target.value));
+      if (selB) selB.addEventListener('change', (e) => appState.setScenarioSite('B', e.target.value));
+
+      const slider = document.getElementById('timelineSlider');
+      slider.addEventListener('input', (e) => appState.setHour(parseFloat(e.target.value)));
+
+      const btnPlay = document.getElementById('btnPlayPause');
+      btnPlay.addEventListener('click', () => appState.togglePlay());
+
+      document.getElementById('btnStepBack')?.addEventListener('click', () => {
+        appState.setHour(Math.max(0, appState.currentHour - 1));
+      });
+      document.getElementById('btnStepForward')?.addEventListener('click', () => {
+        appState.setHour(Math.min(708, appState.currentHour + 1));
+      });
+      const btnLoop = document.getElementById('btnLoop');
+      btnLoop?.addEventListener('click', () => {
+        btnLoop.classList.toggle('active');
+      });
+
+      document.getElementById('btnSpeed1').addEventListener('click', () => appState.setPlaySpeed(1));
+      document.getElementById('btnSpeed3').addEventListener('click', () => appState.setPlaySpeed(3));
+      document.getElementById('btnSpeed6').addEventListener('click', () => appState.setPlaySpeed(6));
+
+      document.getElementById('btnViewPolar').addEventListener('click', () => appState.setViewMode('polar'));
+      document.getElementById('btnViewLinear').addEventListener('click', () => appState.setViewMode('linear'));
+
+      // Tab switcher
+      document.querySelectorAll('.tab-item').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+          e.currentTarget.classList.add('active');
+          const tabKey = e.currentTarget.getAttribute('data-tab');
+          document.getElementById(`tab-${tabKey}`).classList.add('active');
+          appState.setActiveTab(tabKey);
+          updateUI();
+        });
+      });
+
+      // Export handlers
+      document.getElementById('btnExportCSV').addEventListener('click', () => {
+        const csv = appState.exportToCSV();
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `selenesight_${appState.activeSite.id}_ephemeris.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+
+      document.getElementById('btnExportJSON').addEventListener('click', () => {
+        const json = appState.exportToJSON();
+        const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `selenesight_${appState.activeSite.id}_ephemeris.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+
+      // Update Scenario Comparator UI
+      function updateScenarioUI() {
+        const selA = document.getElementById('selectScenarioA');
+        const selB = document.getElementById('selectScenarioB');
+        if (selA && appState.scenarioA) selA.value = appState.scenarioA.siteId;
+        if (selB && appState.scenarioB) selB.value = appState.scenarioB.siteId;
+
+        const a = appState.scenarioA.cycleData;
+        const b = appState.scenarioB.cycleData;
+        const delta = appState.computeScenarioDelta();
+
+        const aEl = document.getElementById('statsScenarioA');
+        const bEl = document.getElementById('statsScenarioB');
+        const deltaEl = document.getElementById('deltaResults');
+
+        if (a && aEl) {
+          aEl.innerHTML = `
+            <div class="delta-row"><span>Elevation:</span><span class="delta-val">${a.site.elevM} m</span></div>
+            <div class="delta-row"><span>Mean Slope:</span><span class="delta-val">${a.site.slopeDeg}°</span></div>
+            <div class="delta-row"><span>Sunlit Window:</span><span class="delta-val">${a.sunlitPct}% (${a.sunlitHours}h)</span></div>
+            <div class="delta-row"><span>DTE Comm Window:</span><span class="delta-val">${a.dtePct}% (${a.dteHours}h)</span></div>
+            <div class="delta-row"><span>Viability Score:</span><span class="delta-val" style="color:var(--color-solar-light);">${a.viabilityScore} / 100</span></div>
+          `;
+        }
+
+        if (b && bEl) {
+          bEl.innerHTML = `
+            <div class="delta-row"><span>Elevation:</span><span class="delta-val">${b.site.elevM} m</span></div>
+            <div class="delta-row"><span>Mean Slope:</span><span class="delta-val">${b.site.slopeDeg}°</span></div>
+            <div class="delta-row"><span>Sunlit Window:</span><span class="delta-val">${b.sunlitPct}% (${b.sunlitHours}h)</span></div>
+            <div class="delta-row"><span>DTE Comm Window:</span><span class="delta-val">${b.dtePct}% (${b.dteHours}h)</span></div>
+            <div class="delta-row"><span>Viability Score:</span><span class="delta-val" style="color:var(--color-solar-light);">${b.viabilityScore} / 100</span></div>
+          `;
+        }
+
+        if (delta && deltaEl) {
+          const fmt = (v, unit = '') => {
+            const cls = v > 0 ? 'delta-pos' : v < 0 ? 'delta-neg' : 'delta-zero';
+            const sgn = v > 0 ? '+' : '';
+            return `<span class="delta-val ${cls}">${sgn}${v}${unit}</span>`;
+          };
+
+          deltaEl.innerHTML = `
+            <div class="delta-row"><span>Sunlight Duration Delta:</span>${fmt(delta.sunlitHoursDelta, ' hrs')}</div>
+            <div class="delta-row"><span>DTE Comm Duration Delta:</span>${fmt(delta.dteHoursDelta, ' hrs')}</div>
+            <div class="delta-row"><span>Simultaneous Dual Window Delta:</span>${fmt(delta.dualHoursDelta, ' hrs')}</div>
+            <div class="delta-row"><span>Viability Score Delta:</span>${fmt(delta.viabilityScoreDelta, ' pts')}</div>
+            <div class="delta-row"><span>Elevation Difference:</span>${fmt(delta.elevMDelta, ' m')}</div>
+            <div class="delta-row"><span>Slope Difference:</span>${fmt(delta.slopeDelta, '°')}</div>
+          `;
+        }
+      }
+
+      // Synchronize All UI Elements
+      function updateUI() {
+        const data = appState.cycleData;
+        if (!data || !data.steps) return;
+
+        const curH = appState.currentHour;
+        const step = data.steps[curH] || data.steps[0];
+
+        // 1. KPIs
+        document.getElementById('kpiSunlitPct').textContent = `${data.sunlitPct}%`;
+        document.getElementById('kpiSunlitHours').textContent = `${data.sunlitHours} / 708 hrs`;
+        document.getElementById('kpiDtePct').textContent = `${data.dtePct}%`;
+        document.getElementById('kpiDteHours').textContent = `${data.dteHours} / 708 hrs`;
+        document.getElementById('kpiDualPct').textContent = `${data.dualPct}%`;
+        document.getElementById('kpiDualHours').textContent = `${data.dualHours} / 708 hrs`;
+        document.getElementById('kpiViabilityScore').textContent = `${data.viabilityScore} / 100`;
+        document.getElementById('kpiSlopeGrade').textContent = `Slope: ${data.site.slopeDeg}°`;
+
+        // 2. Telemetry Details
+        document.getElementById('currentEpochBadge').textContent = `T+${curH}h`;
+        document.getElementById('lblHourOffset').textContent = curH;
+        document.getElementById('timelineSlider').value = curH;
+
+        document.getElementById('cellSunEl').textContent = `${step.sunElDeg}°`;
+        document.getElementById('cellSunAz').textContent = `${step.sunAzDeg}°`;
+        document.getElementById('cellSunMask').textContent = `${step.sunHorizonMaskDeg}°`;
+        document.getElementById('cellArrayEff').textContent = `${step.arrayEfficiency}%`;
+        document.getElementById('cellSolarFlux').textContent = `${step.solarFluxWm2} W/m²`;
+        document.getElementById('cellEarthEl').textContent = `${step.earthElDeg}°`;
+        document.getElementById('cellLibration').textContent = `${step.libLatDeg}° / ${step.libLonDeg}°`;
+
+        // Status Badges
+        const sunBadge = document.getElementById('statusSunLit');
+        sunBadge.innerHTML = step.isSunlit
+          ? '<span class="badge-status badge-ok">ILLUMINATED</span>'
+          : '<span class="badge-status badge-alert">SHADOWED</span>';
+
+        const earthBadge = document.getElementById('statusEarthVis');
+        earthBadge.innerHTML = step.isEarthVisible
+          ? '<span class="badge-status badge-ok">LINE-OF-SIGHT</span>'
+          : '<span class="badge-status badge-alert">OCCULTED</span>';
+
+        // Countdowns
+        const cd = ephemerisEngine.getTransitionCountdowns(data.steps, curH);
+        document.getElementById('cellNextSunset').textContent = cd.nextSunset !== null ? `${cd.nextSunset} hrs` : 'N/A (Sunlit)';
+        document.getElementById('cellNextEarthset').textContent = cd.nextEarthset !== null ? `${cd.nextEarthset} hrs` : 'N/A (LOS Lock)';
+
+        // Playback button text
+        btnPlay.textContent = appState.isPlaying ? 'Pause' : 'Play';
+        [1, 3, 6].forEach(spd => {
+          const b = document.getElementById(`btnSpeed${spd}`);
+          if (b) {
+            if (appState.playSpeed === spd) b.classList.add('active');
+            else b.classList.remove('active');
+          }
+        });
+
+        // View Mode buttons
+        const bPol = document.getElementById('btnViewPolar');
+        const bLin = document.getElementById('btnViewLinear');
+        if (bPol && bLin) {
+          if (appState.viewMode === 'polar') {
+            bPol.classList.add('active'); bLin.classList.remove('active');
+          } else {
+            bLin.classList.add('active'); bPol.classList.remove('active');
+          }
+        }
+
+        // Render Canvases
+        renderTrajectoryCurveCanvas(
+          document.getElementById('telemetryCurveCanvas'),
+          data,
+          curH
+        );
+
+        renderSkyplotCanvas(
+          document.getElementById('skyplotCanvas'),
+          data,
+          curH,
+          appState.viewMode
+        );
+
+        // Update External Portal Links
+        updatePortalLinks(data.site);
+
+        // Update Scenario Tab
+        updateScenarioUI();
+      }
+
+      // Reactive Bindings
+      appState.addEventListener('cycleChanged', updateUI);
+      appState.addEventListener('hourChanged', updateUI);
+      appState.addEventListener('siteChanged', () => {
+        siteSelector.value = appState.activeSite.id;
+        updateUI();
+      });
+      appState.addEventListener('arrayTypeChanged', () => {
+        const arrSel = document.getElementById('arrayTypeSelect');
+        if (arrSel) arrSel.value = appState.arrayType;
+        updateUI();
+      });
+      appState.addEventListener('tabChanged', () => {
+        const tabKey = appState.activeTab;
+        document.querySelectorAll('.tab-item').forEach(b => {
+          b.classList.toggle('active', b.getAttribute('data-tab') === tabKey);
+        });
+        document.querySelectorAll('.tab-panel').forEach(p => {
+          p.classList.toggle('active', p.id === `tab-${tabKey}`);
+        });
+        updateUI();
+      });
+      appState.addEventListener('viewModeChanged', updateUI);
+      appState.addEventListener('playStateChanged', updateUI);
+      appState.addEventListener('speedChanged', updateUI);
+      appState.addEventListener('scenariosUpdated', updateScenarioUI);
+
+      // Initial execution
+      updateUI();
+    }
+
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', bootstrap);
+    } else {
+      bootstrap();
+    }
+  </script>
+</body>
+</html>
