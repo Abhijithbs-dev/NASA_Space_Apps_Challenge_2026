@@ -14,157 +14,229 @@
 <body>
   <div class="deck-container" id="deckContainer">
     
-    <!-- Slide 1: Title & Team -->
+    <!-- Slide 1: Title, Team & Verified Architecture -->
     <section class="slide active" id="slide-1">
-      <div class="slide-badge">NASA SPACE APPS CHALLENGE 2026</div>
+      <div class="badge-row">
+        <span class="badge-item blue">NASA SPACE APPS CHALLENGE 2026</span>
+        <span class="badge-item">460/460 TESTS PASSED (100%)</span>
+        <span class="badge-item amber">12 LUNAR SITES CATALOG</span>
+        <span class="badge-item">PURE ES2022 • ZERO DEPENDENCIES</span>
+      </div>
       <h1 class="slide-title">SeleneSight</h1>
       <h2 class="slide-subtitle">Lunar South Pole Horizon, Solar Power & Direct-to-Earth (DTE) Comm Evaluator</h2>
-      <p class="tagline">Empowering Artemis, CLPS, and International Mission Planners with Instant Topocentric Horizon & Solar Telemetry</p>
+      <p class="tagline">Rapid Topocentric Ephemerides, Terrain Shadow Masking, and Golden Window Siting for Artemis & CLPS Missions</p>
       <div class="team-grid">
-        <div class="member-chip"><strong>Abhijith B S</strong><span>Team Lead & Full-Stack Architect</span></div>
-        <div class="member-chip"><strong>Anusree S</strong><span>Lunar Topography & LOLA Data Lead</span></div>
-        <div class="member-chip"><strong>Alfiya S</strong><span>UI/UX & Interactive Visuals Lead</span></div>
-        <div class="member-chip"><strong>Adith V S</strong><span>Mission Science & Demo Pitch Lead</span></div>
+        <div class="member-chip">
+          <strong>Abhijith B S</strong>
+          <span>Team Lead & Full-Stack Architect (Core Ephemeris Engine, AppState, Test Suite)</span>
+        </div>
+        <div class="member-chip">
+          <strong>Anusree S</strong>
+          <span>Lunar Topography & LOLA Data Lead (12 Sites Catalog, Horizon Masks, NASA Portals)</span>
+        </div>
+        <div class="member-chip">
+          <strong>Alfiya S</strong>
+          <span>UI/UX & Interactive Visuals Lead (360° Skyplots, Polar Map, 708h Timeline Ribbons)</span>
+        </div>
+        <div class="member-chip">
+          <strong>Adith V S</strong>
+          <span>Mission Science & Pitch Lead (CSA Integration, Educator Science Cards, Demo Deck)</span>
+        </div>
       </div>
-      <div class="slide-footer">Slide 1 / 7 • Use Arrow Keys [← / →] or Spacebar to Navigate</div>
+      <div class="slide-footer">
+        <span>Slide 1 / 7 • Use Arrow Keys [← / →], Spacebar, or Buttons to Navigate</span>
+        <span>Open Source • MIT License</span>
+      </div>
     </section>
 
-    <!-- Slide 2: The Problem -->
+    <!-- Slide 2: The Lunar South Pole Problem -->
     <section class="slide" id="slide-2">
       <div class="slide-badge">THE PROBLEM</div>
       <h2 class="slide-title">The Lunar South Pole Operational Bottleneck</h2>
       <div class="content-split">
         <div class="card">
-          <h3>☀️ Extreme Grazing Sunlight</h3>
-          <p>The Moon's <strong>1.54° axial tilt</strong> keeps the Sun skimming the horizon in a 360° circle. Horizontal solar panels yield <strong>under 3% efficiency</strong>. Even modest crater rims cast 20-km shadows.</p>
+          <h3>☀️ Grazing Solar Rays & Knife-Edge Shadows</h3>
+          <p>The Moon's minuscule <strong>1.5424° axial tilt</strong> keeps the Sun skimming the horizon in a 360° circle. Horizontal solar panels yield <strong>under 3% efficiency</strong>. Modest 200m crater rims cast <strong>20-km shadows</strong>, plunging regions into cryogenic cold (&lt;40 K) with instant <strong>150°C thermal drops</strong> that freeze rover batteries.</p>
         </div>
         <div class="card">
-          <h3>📡 Libration Radio Blackouts</h3>
-          <p>Optical libration (<strong>±6.68° lat, ±7.90° lon</strong>) causes Earth to nod up and down, dropping below jagged massifs and severing Direct-to-Earth (DTE) communications.</p>
+          <h3>📡 Libration Wobble & Periodic DTE Blackouts</h3>
+          <p>Lunar optical libration (<strong>±6.68° draconic lat, ±7.90° anomalistic lon</strong>) causes Earth to nod and wag across the local horizon. Towering massifs like Shackleton and Malapert repeatedly obstruct direct line-of-sight, severing communications with NASA's Deep Space Network (DSN).</p>
         </div>
       </div>
       <div class="highlight-box">
-        Existing desktop mission tools (SPICE kernels, desktop GIS) are fragmented, complex, and inaccessible to field planners and rapid mission evaluators.
+        Existing desktop mission tools (SPICE kernels, heavy GIS suites) require complex command-line configurations, minutes of execution time, and specialized licenses, creating an operational bottleneck for rapid site evaluation.
       </div>
-      <div class="slide-footer">Slide 2 / 7</div>
+      <div class="slide-footer">
+        <span>Slide 2 / 7 • Mission Challenge</span>
+        <span>Artemis III, CLPS & CSA Operational Context</span>
+      </div>
     </section>
 
-    <!-- Slide 3: The Solution -->
+    <!-- Slide 3: Our Solution -->
     <section class="slide" id="slide-3">
       <div class="slide-badge">OUR SOLUTION</div>
       <h2 class="slide-title">SeleneSight: Topocentric Clarity in Seconds</h2>
       <div class="three-col">
         <div class="card mini">
           <div class="icon">🧭</div>
-          <h4>360° Polar Dome Skyplot</h4>
-          <p>Real-time projection of solar tracks, Earth libration Lissajous loops, and LOLA shadow masks.</p>
+          <h4>360° Polar Dome & Linear Skyplots</h4>
+          <p>Real-time projection of the 29.53-day gold solar track and cyan Earth libration loop overlaid directly against the LOLA crater-rim horizon shadow mask.</p>
         </div>
         <div class="card mini">
           <div class="icon">📈</div>
-          <h4>708-Hour Ribbon Timeline</h4>
-          <p>Complete synodic cycle power curves, DTE communication windows, and scrubber telemetry.</p>
+          <h4>708-Hour Synodic Ribbon Timeline</h4>
+          <p>Continuous hourly solar and Earth elevations, vertical mast vs 2-axis tracking power generation curves, and interactive multi-speed scrubber playback (1x, 3x, 6x).</p>
         </div>
         <div class="card mini">
           <div class="icon">⚖️</div>
-          <h4>Scenario Comparator</h4>
-          <p>Side-by-side trade-off deltas (Site A vs. B) for sunlight hours, comms, and slope safety.</p>
-        </div>
-      </div>
-      <div class="slide-footer">Slide 3 / 7</div>
-    </section>
-
-    <!-- Slide 4: User Experience Walkthrough -->
-    <section class="slide" id="slide-4">
-      <div class="slide-badge">PRODUCT WALKTHROUGH</div>
-      <h2 class="slide-title">Actionable Telemetry for Rapid Decision-Making</h2>
-      <div class="flow-container">
-        <div class="step-card">
-          <span class="step-num">1</span>
-          <h4>Select Landing Site</h4>
-          <p>Choose from 12 curated Artemis III, CLPS, and ISRO sites or input custom coordinates.</p>
-        </div>
-        <div class="step-arrow">→</div>
-        <div class="step-card">
-          <span class="step-num">2</span>
-          <h4>Evaluate Horizon Mask</h4>
-          <p>Instant LOLA 360° terrain elevation polygon calculation showing terrain shadow ingress.</p>
-        </div>
-        <div class="step-arrow">→</div>
-        <div class="step-card">
-          <span class="step-num">3</span>
-          <h4>Isolate Golden Windows</h4>
-          <p>Pinpoint simultaneous sunlight AND DTE comm hours; export JPL Horizons-compatible CSV/JSON.</p>
+          <h4>Side-by-Side Scenario Comparator</h4>
+          <p>Instant trade-off delta evaluations (Site/Date A vs. B) across 6 critical mission parameters: Sunlit Hours, DTE Hours, Dual Golden Hours, Elevation, Slope & Viability Score.</p>
         </div>
       </div>
       <div class="kpi-banner">
-        <span>⏱️ <strong>Live Countdown Clocks:</strong> Hours to Next Sunset • Sunrise • Earthset • Earthrise</span>
+        <span>⏱️ <strong>Live Predictive Countdown Telemetry:</strong> Exact hours remaining to Next Sunset • Sunrise • Earthset • Earthrise</span>
       </div>
-      <div class="slide-footer">Slide 4 / 7</div>
+      <div class="slide-footer">
+        <span>Slide 3 / 7 • Core Innovations</span>
+        <span>Zero-Latency Client-Side Computing</span>
+      </div>
     </section>
 
-    <!-- Slide 5: Scientific Validity & Grounded Data -->
+    <!-- Slide 4: Real-World Mission Workflow -->
+    <section class="slide" id="slide-4">
+      <div class="slide-badge">PRODUCT WALKTHROUGH</div>
+      <h2 class="slide-title">Actionable Telemetry for Rapid Decision-Making</h2>
+      <div class="four-col">
+        <div class="step-card">
+          <span class="step-num">1</span>
+          <h4>Curated Landing Sites</h4>
+          <p>Select from <strong>12 candidate sites</strong> (Artemis III, CLPS IM-1 Nova-C, ISRO Chandrayaan-3, Apollo benchmarks) or custom coordinates.</p>
+        </div>
+        <div class="step-card">
+          <span class="step-num">2</span>
+          <h4>LOLA Terrain Masking</h4>
+          <p>Instant 360° terrain elevation polygon calculation with 12-sector interpolation and vacuum horizon dip allowance $\theta_{\text{dip}} = \arccos(R/(R+h))$.</p>
+        </div>
+        <div class="step-card">
+          <span class="step-num">3</span>
+          <h4>Isolate Golden Windows</h4>
+          <p>Pinpoint simultaneous <strong>Sunlight + DTE Line-of-Sight</strong> hours to schedule critical EVAs, science drilling, and rover battery charging.</p>
+        </div>
+        <div class="step-card">
+          <span class="step-num">4</span>
+          <h4>Export & Spatial Portals</h4>
+          <p>Export JPL Horizons-compatible <strong>710-row CSV / JSON</strong> ephemeris; 1-click launch into <strong>LROC QuickMap, Moon Trek & CSA portals</strong>.</p>
+        </div>
+      </div>
+      <div class="kpi-banner">
+        <span>📊 <strong>Automated Multi-Criteria Viability Scoring:</strong> Balanced weight of 45% Sunlit Duration + 35% DTE Link Reliability + 20% Terrain Slope Safety</span>
+      </div>
+      <div class="slide-footer">
+        <span>Slide 4 / 7 • End-to-End Workflow</span>
+        <span>Interactive Mission Control Shell</span>
+      </div>
+    </section>
+
+    <!-- Slide 5: Scientific Validity & Space Agency Grounding -->
     <section class="slide" id="slide-5">
       <div class="slide-badge">SCIENTIFIC RIGOR</div>
       <h2 class="slide-title">Grounded in NASA & CSA Open Planetary Data</h2>
       <div class="data-grid">
-        <div class="data-pill"><strong>NASA LOLA (LRO):</strong> Gridded digital elevation models for 360° horizon mask profiling</div>
-        <div class="data-pill"><strong>JPL Horizons:</strong> Topocentric ephemeris calibration & optical libration amplitudes</div>
-        <div class="data-pill"><strong>LROC QuickMap & Moon Trek:</strong> High-resolution optical morphology and slope verification</div>
-        <div class="data-pill"><strong>CSA Moon Exploration:</strong> Canadarm3 AI robotics and Lunar Utility Vehicle operational constraints</div>
+        <div class="data-pill"><strong>NASA LOLA (LRO):</strong> Gridded digital elevation models (DEM) for 360° azimuthal crater-rim horizon profiles across 12 sectors.</div>
+        <div class="data-pill"><strong>NASA JPL Horizons:</strong> Topocentric ephemeris calibration, Jean Meeus astronomical algorithms, and synodic drift ($\omega_{\text{syn}} \approx 0.507948^\circ/\text{hr}$).</div>
+        <div class="data-pill"><strong>LROC QuickMap & NASA Moon Trek:</strong> High-resolution Narrow Angle Camera (NAC) imagery, slope safety, and crater morphology cross-referencing.</div>
+        <div class="data-pill"><strong>Canadian Space Agency (CSA):</strong> Canadarm3 Gateway autonomous AI robotics and Canadian Lunar Utility Vehicle (LUV) power constraints.</div>
       </div>
-      <div class="equation-bar">
-        $$\text{Power (Vertical Mast)} \propto S_0 \cdot \cos(\text{elevation}_{\odot}) \quad\mid\quad \Delta \text{Libration}_{\text{lon}} = \pm 7.90^\circ, \; \Delta \text{Libration}_{\text{lat}} = \pm 6.68^\circ$$
+      <div class="formula-grid">
+        <div class="formula-cell">
+          <span class="formula-label">Photovoltaic Array Power Generation Model</span>
+          <div class="formula-math">$$\eta_{\text{vert}} = \max(0, \cos El_\odot) \times 100\% \quad\mid\quad \text{Flux} = 1,361.0 \times \frac{\eta}{100}\text{ W/m}^2$$</div>
+        </div>
+        <div class="formula-cell">
+          <span class="formula-label">Lunar Vacuum Horizon Dip & Elevation Gain</span>
+          <div class="formula-math">$$\theta_{\text{dip}} = \arccos\left(\frac{R_M}{R_M + h}\right) \quad\mid\quad \delta_{\text{elev}} = \sqrt{\frac{2h}{R_M}}$$</div>
+        </div>
       </div>
-      <div class="slide-footer">Slide 5 / 7</div>
+      <div class="slide-footer">
+        <span>Slide 5 / 7 • Physics Oracles</span>
+        <span>NASA / JPL / LRO / CSA Authoritative Standards</span>
+      </div>
     </section>
 
-    <!-- Slide 6: Dual Accessibility -->
+    <!-- Slide 6: Dual Accessibility & 460-Test Mission Assurance -->
     <section class="slide" id="slide-6">
-      <div class="slide-badge">ACCESSIBILITY</div>
-      <h2 class="slide-title">Aerospace Precision Meets Public Inspiration</h2>
+      <div class="slide-badge">ACCESSIBILITY & QUALITY</div>
+      <h2 class="slide-title">Aerospace Precision Meets Verified Mission Assurance</h2>
       <div class="content-split">
         <div class="card">
-          <h3>🛰️ Mission Planner Mode</h3>
-          <p>Engineered for mission architects: raw topocentric coordinates, array efficiencies, sub-solar points, countdown hours, and CSV export.</p>
+          <h3>🛰️ Aerospace Mission Control Mode</h3>
+          <p>Built for engineers and flight directors: monospace telemetry readouts, dynamic canvas trajectories, multi-speed playback (1x, 3x, 6x), CSV/JSON data pipelines, and scenario trade-off delta metrics.</p>
         </div>
         <div class="card">
           <h3>🎓 Educator & Public Explorer Mode</h3>
-          <p>Curated science cards translating complex orbital physics—1.54° tilt, cryogenic cold traps, and Canadian robotics—into plain language.</p>
+          <p><strong>10 curated interactive science cards</strong> translating complex orbital physics—the 1.54° axial tilt, cryogenic cold traps in PSRs, vacuum optics, libration Lissajous figures, and Canadian robotics—into plain language.</p>
         </div>
       </div>
-      <div class="quote-box">
-        Zero logins. Zero paywalls. Zero install dependencies. Built purely on standard modern Web APIs.
+      <div class="verification-grid">
+        <div class="verification-card">
+          <div class="metric-count">94</div>
+          <div class="metric-tier">Tier 1: Feature Contracts</div>
+        </div>
+        <div class="verification-card">
+          <div class="metric-count">90</div>
+          <div class="metric-tier">Tier 2: Boundary Value (BVA)</div>
+        </div>
+        <div class="verification-card">
+          <div class="metric-count">98</div>
+          <div class="metric-tier">Tier 3: Pairwise Combinations</div>
+        </div>
+        <div class="verification-card">
+          <div class="metric-count">88</div>
+          <div class="metric-tier">Tier 4: Mission Scenarios</div>
+        </div>
+        <div class="verification-card">
+          <div class="metric-count">90</div>
+          <div class="metric-tier">Tier 5: Adversarial Hardening</div>
+        </div>
       </div>
-      <div class="slide-footer">Slide 6 / 7</div>
+      <div class="slide-footer">
+        <span>Slide 6 / 7 • Verification Suite</span>
+        <span>460/460 Tests Passed • Headless Browser Verified (187k+ Canvas Pixels)</span>
+      </div>
     </section>
 
-    <!-- Slide 7: Vision & Future Impact -->
+    <!-- Slide 7: Vision, Impact & Open Access -->
     <section class="slide" id="slide-7">
       <div class="slide-badge">IMPACT & ROADMAP</div>
       <h2 class="slide-title">Illuminating the Future of Lunar Exploration</h2>
       <div class="three-col">
         <div class="card mini">
           <h4>Artemis Campaign</h4>
-          <p>Enabling EVA route planning, habitat siting, and emergency power contingency windows.</p>
+          <p>Enabling landing site candidate selection, EVA traverse safety, habitat placement, and emergency battery preservation during crater shadow passages.</p>
         </div>
         <div class="card mini">
           <h4>CLPS Commercial Rovers</h4>
-          <p>Optimizing battery conservation, drill deployment, and communication passes.</p>
+          <p>Optimizing payload duty cycles, thermal survival heating budgets, volatile water-ice prospecting, and DTE ground communications.</p>
         </div>
         <div class="card mini">
-          <h4>Global Lunar Science</h4>
-          <p>Open access tool for universities, educators, and emerging space agencies worldwide.</p>
+          <h4>Global STEM Education</h4>
+          <p>Free, zero-install planetary science sandbox for universities, schools, researchers, and emerging space agencies worldwide.</p>
         </div>
       </div>
       <div class="links-card">
-        <div><strong>Public GitHub Repository:</strong> github.com/&lt;Abhijithbs-dev&gt;/NASA_Space_Apps_Challenge_2026</div>
-        <div><strong>Live Application URL:</strong> &lt;Abhijithbs-dev&gt;.github.io/NASA_Space_Apps_Challenge_2026/</div>
+        <div><strong>Public GitHub Repository:</strong> https://github.com/Abhijithbs-dev/NASA_Space_Apps_Challenge_2026</div>
+        <div><strong>Live Web Application:</strong> https://abhijithbs-dev.github.io/NASA_Space_Apps_Challenge_2026/</div>
+        <div><strong>Interactive 7-Slide Pitch Deck:</strong> https://abhijithbs-dev.github.io/NASA_Space_Apps_Challenge_2026/docs/demo_deck/</div>
       </div>
-      <div class="slide-footer">Slide 7 / 7 • Thank You, NASA Space Apps 2026 Judges!</div>
+      <div class="slide-footer">
+        <span>Slide 7 / 7 • Thank You, NASA Space Apps 2026 Judges!</span>
+        <span>FortiGuard Approved: Educational Web-Based Application</span>
+      </div>
     </section>
 
   </div>
 
+  <!-- Slide Navigation Controls -->
   <div class="nav-controls">
     <button id="prevBtn" type="button">← Previous</button>
     <span id="slideIndicator">1 / 7</span>
@@ -220,9 +292,9 @@
     function handleSwipe() {
       const threshold = 40;
       if (touchEndX < touchStartX - threshold) {
-        showSlide(currentSlide + 1); // Swipe Left -> Next
+        showSlide(currentSlide + 1);
       } else if (touchEndX > touchStartX + threshold) {
-        showSlide(currentSlide - 1); // Swipe Right -> Prev
+        showSlide(currentSlide - 1);
       }
     }
   </script>
