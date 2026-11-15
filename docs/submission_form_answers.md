@@ -94,7 +94,7 @@ In strict adherence to page 9 of the NASA Space Apps Challenge Project Submissio
 ---
 
 ## 7. Open Source Repository & Public Demonstration Links
-- **Public GitHub Repository:** https://github.com/<username>/selenesight-spaceapps-2026
-- **Live Web Application:** https://<username>.github.io/selenesight-spaceapps-2026/
-- **7-Slide Interactive Deck:** https://<username>.github.io/selenesight-spaceapps-2026/docs/demo_deck/
+- **Public GitHub Repository:** https://github.com/Abhijithbs-dev/NASA_Space_Apps_Challenge_2026
+- **Live Web Application:** https://abhijithbs-dev.github.io/NASA_Space_Apps_Challenge_2026/
+- **7-Slide Interactive Deck:** https://abhijithbs-dev.github.io/NASA_Space_Apps_Challenge_2026/docs/demo_deck/
 - **FortiGuard Web Category Submission:** Category: *Educational* / *Web-based application*, Company Name: `N/A`.

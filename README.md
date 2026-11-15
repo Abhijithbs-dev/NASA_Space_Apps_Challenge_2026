@@ -37,7 +37,7 @@ SeleneSight fuses **NASA Lunar Orbiter Laser Altimeter (LOLA)** topographic hori
 SeleneSight is architected with strict folder-level isolation to ensure zero Git merge conflicts and modular extensibility:
 
 ```text
-selenesight-spaceapps-2026/
+NASA_Space_Apps_Challenge_2026/
 ├── index.html                        # App Shell & Module Orchestrator (Abhijith B S)
 ├── README.md                         # Project Documentation & Scientific Citations (Adith V S)
 ├── .gitignore                        # Standard OS & Editor Ignore Rules (Abhijith B S)
@@ -104,8 +104,8 @@ SeleneSight is built with zero build steps, zero external npm package dependenci
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/<your-username>/selenesight-spaceapps-2026.git
-cd selenesight-spaceapps-2026
+git clone https://github.com/Abhijithbs-dev/NASA_Space_Apps_Challenge_2026.git
+cd NASA_Space_Apps_Challenge_2026
 
 # 2. Run a local static HTTP server
 python3 -m http.server 8000
